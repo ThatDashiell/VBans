@@ -1,7 +1,6 @@
 package de.strifel.vbans.commands;
 
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.strifel.vbans.VBans;
@@ -16,11 +15,10 @@ import static de.strifel.vbans.Util.COLOR_RED;
 import static de.strifel.vbans.Util.COLOR_YELLOW;
 import static de.strifel.vbans.commands.CommandTempBan.getBanDuration;
 
-public class CommandReduce implements SimpleCommand {
-    private final DatabaseConnection database;
+public class CommandReduce extends VBanCommand {
 
     public CommandReduce(VBans vBans) {
-        this.database = vBans.getDatabaseConnection();
+        super(vBans);
     }
 
     @Override

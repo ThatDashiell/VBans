@@ -1,7 +1,6 @@
 package de.strifel.vbans.commands;
 
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.strifel.vbans.VBans;
@@ -14,11 +13,9 @@ import java.util.concurrent.CompletableFuture;
 import static de.strifel.vbans.Util.COLOR_RED;
 import static de.strifel.vbans.Util.COLOR_YELLOW;
 
-public class CommandPurgeBan implements SimpleCommand {
-    private final DatabaseConnection database;
-
-    public CommandPurgeBan(VBans vbans) {
-        database = vbans.getDatabaseConnection();
+public class CommandPurgeBan extends VBanCommand {
+    public CommandPurgeBan(VBans vBans) {
+        super(vBans);
     }
 
     @Override

@@ -1,13 +1,10 @@
 package de.strifel.vbans.commands;
 
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.strifel.vbans.Util;
 import de.strifel.vbans.VBans;
-import de.strifel.vbans.database.DatabaseConnection;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
@@ -19,17 +16,14 @@ import java.util.concurrent.CompletableFuture;
 import static de.strifel.vbans.Util.COLOR_RED;
 import static de.strifel.vbans.Util.COLOR_YELLOW;
 
-public class CommandKick implements SimpleCommand {
-    private final ProxyServer server;
-    private final DatabaseConnection database;
+public class CommandKick extends VBanCommand {
     private final String DEFAULT_REASON;
     private final String KICK_LAYOUT;
 
-    public CommandKick(VBans vbans) {
-        this.server = vbans.getServer();
-        database = vbans.getDatabaseConnection();
-        DEFAULT_REASON = vbans.getMessages().getString("StandardKickMessage");
-        KICK_LAYOUT = vbans.getMessages().getString("KickLayout");
+    public CommandKick(VBans vBans) {
+        super(vBans);
+        DEFAULT_REASON = vBans.getMessages().getString("StandardKickMessage");
+        KICK_LAYOUT = vBans.getMessages().getString("KickLayout");
     }
 
     @Override

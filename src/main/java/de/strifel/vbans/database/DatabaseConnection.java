@@ -9,10 +9,7 @@ import java.util.List;
 
 public class DatabaseConnection {
 
-    private final HikariDataSource dataSource;
-
     public static final String BANNED_CRITERIA = "purged IS NULL and ((reducedUntil is NULL and (until = -1 or until > ?)) or (reducedUntil = -1 or reducedUntil > ?))";
-
     private static final String INSERT_BAN = "INSERT INTO ban_bans (user, until, bannedBy, reason, issuedAt) VALUES (?, ?, ?, ?, ?)";
     private static final String GET_BAN = "SELECT id, reason, until, bannedBy, reducedUntil, issuedAt FROM ban_bans WHERE " + BANNED_CRITERIA + " and user = ? LIMIT 1";
     private static final String GET_BAN_HISTORY = "SELECT id, reason, until, bannedBy, reducedUntil, issuedAt, purged, reducedBy  FROM ban_bans WHERE user = ?";
@@ -25,6 +22,7 @@ public class DatabaseConnection {
     private static final String REDUCE_BANS = "UPDATE ban_bans SET reducedUntil=?, reducedBy=?, reducedAt=? WHERE " + BANNED_CRITERIA + " AND user=?";
     private static final String GET_USERNAMES_BASE = "SELECT username FROM ban_bans INNER JOIN ban_nameCache ON ban_bans.user = ban_nameCache.user WHERE GROUP BY username";
     private static final String GET_BAN_COUNT = "SELECT count(*) FROM ban_bans WHERE " + BANNED_CRITERIA;
+    private final HikariDataSource dataSource;
 
     public DatabaseConnection(String server, int port, String username, String password, String database) throws ClassNotFoundException, SQLException {
         synchronized (this) {
@@ -55,7 +53,7 @@ public class DatabaseConnection {
     }
 
     public Ban getBan(String userUUID) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(GET_BAN)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_BAN)) {
             statement.setLong(1, System.currentTimeMillis() / 1000);
             statement.setLong(2, System.currentTimeMillis() / 1000);
             statement.setString(3, userUUID);
@@ -71,14 +69,14 @@ public class DatabaseConnection {
         }
     }
 
-    public ArrayList<HistoryBan> getBanHistory(String userUUID, boolean includePurged) {
-        ArrayList<HistoryBan> bans = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(GET_BAN_HISTORY + (includePurged ? "" : " AND PURGED IS NULL"))) {
+    public ArrayList<HistoricalBan> getBanHistory(String userUUID, boolean includePurged) {
+        ArrayList<HistoricalBan> bans = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_BAN_HISTORY + (includePurged ? "" : " AND PURGED IS NULL"))) {
             statement.setString(1, userUUID);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
                 do {
-                    bans.add(new HistoryBan(
+                    bans.add(new HistoricalBan(
                             result.getLong("id"),
                             userUUID, result.getString("bannedBy"),
                             result.getString("reason"),
@@ -96,8 +94,8 @@ public class DatabaseConnection {
         }
     }
 
-    String getUsername(String userUUID) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(GET_USERNAME)) {
+    public String getUsername(String userUUID) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_USERNAME)) {
             statement.setString(1, userUUID);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -112,7 +110,7 @@ public class DatabaseConnection {
     }
 
     public String getUUID(String username) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(GET_UUID)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_UUID)) {
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
@@ -159,7 +157,7 @@ public class DatabaseConnection {
 
 
     public void purgeActiveBans(String userUUID, String purgerUUID) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(PURGE_BANS)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(PURGE_BANS)) {
             statement.setString(1, purgerUUID);
             statement.setLong(2, System.currentTimeMillis() / 1000);
             statement.setLong(3, System.currentTimeMillis() / 1000);
@@ -172,7 +170,7 @@ public class DatabaseConnection {
     }
 
     public void purgeBanById(String userUUID, String purgerUUID, int id) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(PURGE_BAN)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(PURGE_BAN)) {
             statement.setString(1, purgerUUID);
             statement.setString(2, userUUID);
             statement.setInt(3, id);
@@ -184,7 +182,7 @@ public class DatabaseConnection {
 
 
     public void reduceBanTo(String userUUID, String reducerUUID, long reduceTo) {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(REDUCE_BANS)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(REDUCE_BANS)) {
             statement.setLong(1, reduceTo);
             statement.setString(2, reducerUUID);
             statement.setLong(3, System.currentTimeMillis() / 1000);
@@ -213,7 +211,7 @@ public class DatabaseConnection {
     }
 
     public int getBannedCount() {
-        try (Connection connection = dataSource.getConnection();PreparedStatement statement = connection.prepareStatement(GET_BAN_COUNT)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_BAN_COUNT)) {
             statement.setLong(1, System.currentTimeMillis() / 1000);
             statement.setLong(2, System.currentTimeMillis() / 1000);
             ResultSet resultSet = statement.executeQuery();

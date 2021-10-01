@@ -1,13 +1,11 @@
 package de.strifel.vbans.commands;
 
-import com.velocitypowered.api.command.*;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.strifel.vbans.Util;
 import de.strifel.vbans.VBans;
 import de.strifel.vbans.database.Ban;
-import de.strifel.vbans.database.DatabaseConnection;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
@@ -19,19 +17,38 @@ import java.util.concurrent.CompletableFuture;
 import static de.strifel.vbans.Util.COLOR_RED;
 import static de.strifel.vbans.Util.COLOR_YELLOW;
 
-public class CommandTempBan implements SimpleCommand {
-    private final ProxyServer server;
-    private final DatabaseConnection database;
-    private final VBans vBans;
+public class CommandTempBan extends VBanCommand {
     private final String DEFAULT_REASON;
     private final String BANNED_BROADCAST;
 
     public CommandTempBan(VBans vBans) {
-        this.server = vBans.getServer();
-        database = vBans.getDatabaseConnection();
-        this.vBans = vBans;
+        super(vBans);
         this.DEFAULT_REASON = vBans.getMessages().getString("StandardBanMessage");
         this.BANNED_BROADCAST = vBans.getMessages().getString("BannedBroadcast");
+    }
+
+    public static long getBanDuration(String durationString) {
+        if (Util.isInt(durationString)) {
+            return 60L * 60L * 24L * Integer.parseInt(durationString);
+        } else if (durationString.endsWith("d")) {
+            durationString = durationString.replace("d", "");
+            if (!Util.isInt(durationString)) return 0L;
+            return 60L * 60L * 24L * Integer.parseInt(durationString);
+        } else if (durationString.endsWith("h")) {
+            durationString = durationString.replace("h", "");
+            if (!Util.isInt(durationString)) return 0L;
+            return 60L * 60L * Integer.parseInt(durationString);
+        } else if (durationString.endsWith("m")) {
+            durationString = durationString.replace("m", "");
+            if (!Util.isInt(durationString)) return 0L;
+            return 60L * Integer.parseInt(durationString);
+        } else if (durationString.endsWith("s")) {
+            durationString = durationString.replace("s", "");
+            if (!Util.isInt(durationString)) return 0L;
+            return Integer.parseInt(durationString);
+        } else {
+            return 0L;
+        }
     }
 
     public void execute(Invocation commandInvocation) {
@@ -100,7 +117,6 @@ public class CommandTempBan implements SimpleCommand {
         }
     }
 
-
     public CompletableFuture<List<String>> suggestAsync(Invocation commandInvocation) {
         String[] strings = commandInvocation.arguments();
         return CompletableFuture.supplyAsync(() -> {
@@ -116,30 +132,6 @@ public class CommandTempBan implements SimpleCommand {
 
     public boolean hasPermission(Invocation commandInvocation) {
         return commandInvocation.source().hasPermission("VBans.temp");
-    }
-
-    public static long getBanDuration(String durationString) {
-        if (Util.isInt(durationString)) {
-            return 60L * 60L * 24L * Integer.parseInt(durationString);
-        } else if (durationString.endsWith("d")) {
-            durationString = durationString.replace("d", "");
-            if (!Util.isInt(durationString)) return 0L;
-            return 60L * 60L * 24L * Integer.parseInt(durationString);
-        } else if (durationString.endsWith("h")) {
-            durationString = durationString.replace("h", "");
-            if (!Util.isInt(durationString)) return 0L;
-            return 60L * 60L * Integer.parseInt(durationString);
-        } else if (durationString.endsWith("m")) {
-            durationString = durationString.replace("m", "");
-            if (!Util.isInt(durationString)) return 0L;
-            return 60L * Integer.parseInt(durationString);
-        } else if (durationString.endsWith("s")) {
-            durationString = durationString.replace("s", "");
-            if (!Util.isInt(durationString)) return 0L;
-            return Integer.parseInt(durationString);
-        } else {
-            return 0L;
-        }
     }
 
 }

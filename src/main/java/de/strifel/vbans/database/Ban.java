@@ -3,10 +3,13 @@ package de.strifel.vbans.database;
 import de.strifel.vbans.VBans;
 
 public class Ban {
+    protected final long until;
+    protected final long bannedAt;
+    protected final long reducedUntil;
+    protected final long id;
     private final String player, by, reason;
-    long until, bannedAt, reducedUntil, id;
 
-    Ban(long id, String player, String by, String reason, long until, long bannedAt, long reducedUntil) {
+    public Ban(long id, String player, String by, String reason, long until, long bannedAt, long reducedUntil) {
         this.player = player;
         this.by = by;
         this.reason = reason;

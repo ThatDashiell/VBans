@@ -1,13 +1,11 @@
 package de.strifel.vbans.commands;
 
-import com.velocitypowered.api.command.*;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.strifel.vbans.Util;
 import de.strifel.vbans.VBans;
 import de.strifel.vbans.database.Ban;
-import de.strifel.vbans.database.DatabaseConnection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 
@@ -20,17 +18,13 @@ import java.util.concurrent.CompletableFuture;
 import static de.strifel.vbans.Util.COLOR_RED;
 import static de.strifel.vbans.Util.COLOR_YELLOW;
 
-public class CommandBan implements SimpleCommand {
-    private final ProxyServer server;
-    private final DatabaseConnection database;
-    private final VBans vBans;
+public class CommandBan extends VBanCommand {
+
     private final String DEFAULT_REASON;
     private final String BANNED_BROADCAST;
 
     public CommandBan(VBans vBans) {
-        this.server = vBans.getServer();
-        this.database = vBans.getDatabaseConnection();
-        this.vBans = vBans;
+        super(vBans);
         DEFAULT_REASON = vBans.getMessages().getString("StandardBanMessage");
         BANNED_BROADCAST = vBans.getMessages().getString("BannedBroadcast");
     }

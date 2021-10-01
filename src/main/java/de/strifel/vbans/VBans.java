@@ -28,12 +28,24 @@ import java.sql.SQLException;
 public class VBans {
 
     private final ProxyServer server;
-    private DatabaseConnection databaseConnection;
-    private Toml messages;
-    private Toml config;
+    private final Toml messages;
+    private final Toml config;
     private final Metrics.Factory metricsFactory;
     Object luckPermsApi;
+    private DatabaseConnection databaseConnection;
 
+
+    @Inject
+    public VBans(ProxyServer server, Logger logger, @DataDirectory final Path folder, Metrics.Factory metricsFactory) {
+        this.server = server;
+        config = loadConfig(folder);
+        messages = config.getTable("Messages");
+        Util.BAN_TEMPLATE = messages.getString("BanLayout");
+
+        this.metricsFactory = metricsFactory;
+        logger.info("VBans uses bStats to anonymously collect stats like the count of banned players. " +
+                "Make sure to deactivate it if you dont want it to.");
+    }
 
     private Toml loadConfig(Path path) {
         File folder = path.toFile();
@@ -56,19 +68,6 @@ public class VBans {
         }
 
         return new Toml().read(file);
-    }
-
-
-    @Inject
-    public VBans(ProxyServer server, Logger logger, @DataDirectory final Path folder, Metrics.Factory metricsFactory) {
-        this.server = server;
-        config = loadConfig(folder);
-        messages = config.getTable("Messages");
-        Util.BAN_TEMPLATE = messages.getString("BanLayout");
-
-        this.metricsFactory = metricsFactory;
-        logger.info("VBans uses bStats to anonymously collect stats like the count of banned players. " +
-                "Make sure to deactivate it if you dont want it to.");
     }
 
     @Subscribe
