@@ -2,8 +2,6 @@ package de.strifel.vbans.database;
 
 import de.strifel.vbans.VBans;
 
-import java.sql.SQLException;
-
 public class HistoryBan extends Ban {
     private final String purgedBy, reducedBy;
 
@@ -19,20 +17,14 @@ public class HistoryBan extends Ban {
 
     public String getPurgedByUsername(VBans vBans) {
         if (purgedBy.equals("Console")) return purgedBy;
-        try {
-            return vBans.getDatabaseConnection().getUsername(purgedBy);
-        } catch (SQLException e) {
-            return purgedBy;
-        }
+        return vBans.getDatabaseConnection().getUsername(purgedBy);
+
     }
 
     public String getReducedByUsername(VBans vBans) {
         if (reducedBy.equals("Console")) return reducedBy;
-        try {
-            return vBans.getDatabaseConnection().getUsername(reducedBy);
-        } catch (SQLException e) {
-            return reducedBy;
-        }
+        return vBans.getDatabaseConnection().getUsername(reducedBy);
+
     }
 
     public boolean isReduced() {

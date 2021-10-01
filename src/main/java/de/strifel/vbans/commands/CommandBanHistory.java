@@ -10,9 +10,9 @@ import de.strifel.vbans.database.HistoryBan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static de.strifel.vbans.Util.*;
 
@@ -35,31 +35,25 @@ public class CommandBanHistory implements SimpleCommand {
         CommandSource commandSource = commandInvocation.source();
 
         if (strings.length == 1) {
-            try {
-                List<HistoryBan> bans = database.getBanHistory(server.getPlayer(strings[0]).isPresent() ? server.getPlayer(strings[0]).get().getUniqueId().toString() : database.getUUID(strings[0]), commandSource.hasPermission("VBans.history.seeDeleted"));
-                commandSource.sendMessage(Component.text("Ban history of " + strings[0]).color(COLOR_YELLOW));
-                commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
-                for (HistoryBan ban : bans) {
-                    commandSource.sendMessage(generateBanText(ban));
-                }
-                commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
-            } catch (SQLException e) {
-                e.printStackTrace();
+            List<HistoryBan> bans = database.getBanHistory(server.getPlayer(strings[0]).isPresent() ? server.getPlayer(strings[0]).get().getUniqueId().toString() : database.getUUID(strings[0]), commandSource.hasPermission("VBans.history.seeDeleted"));
+            commandSource.sendMessage(Component.text("Ban history of " + strings[0]).color(COLOR_YELLOW));
+            commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
+            for (HistoryBan ban : bans) {
+                commandSource.sendMessage(generateBanText(ban));
             }
+            commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
         } else {
             commandSource.sendMessage(Component.text("Usage: /banhistory <username>").color(COLOR_RED));
         }
     }
 
     @Override
-    public List<String> suggest(Invocation commandInvocation) {
-        try {
+    public CompletableFuture<List<String>> suggestAsync(Invocation commandInvocation) {
+        return CompletableFuture.supplyAsync(() -> {
             List<String> users = database.getUsernamesByQuery("");
             users.addAll(Util.getAllPlayernames(server));
             return users;
-        } catch (SQLException e) {
-            return Util.getAllPlayernames(server);
-        }
+        });
     }
 
     @Override

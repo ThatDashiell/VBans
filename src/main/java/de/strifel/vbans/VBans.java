@@ -1,7 +1,6 @@
 package de.strifel.vbans;
 
 import com.moandjiezana.toml.Toml;
-import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
@@ -90,7 +89,7 @@ public class VBans {
         // Register commands
         server.getCommandManager().register(isGCommand ? "gkick" : "kick", new CommandKick(this), "vkick");
         server.getCommandManager().register(isGCommand ? "gban" : "ban", new CommandBan(this), "vban");
-        server.getCommandManager().register("tban", new CommandTempBan(this),isGCommand ? "gtempban" : "tempban", "vtempban", "vtban");
+        server.getCommandManager().register("tban", new CommandTempBan(this), isGCommand ? "gtempban" : "tempban", "vtempban", "vtban");
         server.getCommandManager().register("pban", new CommandPurgeBan(this), "vpurgeban", "purgeban", "delban");
         server.getCommandManager().register("reduceBan", new CommandReduce(this), "rban", isGCommand ? "gunban" : "unban", isGCommand ? "gpardon" : "pardon");
         server.getCommandManager().register(isGCommand ? "gbanhistory" : "banhistory", new CommandBanHistory(this), "bhistory", "bhist", "banh");
@@ -108,15 +107,11 @@ public class VBans {
 
     @Subscribe
     public void onUserLoginEvent(LoginEvent event) {
-        try {
-            databaseConnection.setUsername(event.getPlayer().getUniqueId().toString(), event.getPlayer().getUsername());
-            Ban ban = databaseConnection.getBan(event.getPlayer().getUniqueId().toString());
-            if (ban != null) {
-                event.setResult(ResultedEvent.ComponentResult.denied(Util.formatBannedMessage(ban, this)));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        databaseConnection.setUsername(event.getPlayer().getUniqueId().toString(), event.getPlayer().getUsername());
+        Ban ban = databaseConnection.getBan(event.getPlayer().getUniqueId().toString());
+        if (ban == null) return;
+        event.setResult(ResultedEvent.ComponentResult.denied(Util.formatBannedMessage(ban, this)));
+
     }
 
     public DatabaseConnection getDatabaseConnection() {

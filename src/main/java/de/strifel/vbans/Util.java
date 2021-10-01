@@ -62,27 +62,22 @@ public class Util {
     public static boolean hasOfflineProtectBanPermission(String uuid, VBans vBans) {
         try {
             // Things are not imported here so the plugin can run without Luckperms
-            if (vBans.luckPermsApi != null) {
-                net.luckperms.api.LuckPerms luckPerms = (net.luckperms.api.LuckPerms) vBans.luckPermsApi;
-                try {
-                    net.luckperms.api.model.user.User user = luckPerms.getUserManager().loadUser(UUID.fromString(uuid)).get();
-                    if (user != null) {
-                        net.luckperms.api.context.ContextManager contextManager = luckPerms.getContextManager();
-                        net.luckperms.api.context.ImmutableContextSet contextSet = contextManager.getContext(user).orElseGet(contextManager::getStaticContext);
+            if (vBans.luckPermsApi == null) return false;
 
-                        net.luckperms.api.cacheddata.CachedPermissionData permissionData = user.getCachedData().getPermissionData(net.luckperms.api.query.QueryOptions.contextual(contextSet));
+            net.luckperms.api.LuckPerms luckPerms = (net.luckperms.api.LuckPerms) vBans.luckPermsApi;
 
-                        return permissionData.checkPermission("*").asBoolean()
-                                || permissionData.checkPermission("VBans.*").asBoolean()
-                                || permissionData.checkPermission("VBans.prevent").asBoolean();
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    return false;
-                }
-            }
-        } catch(NoClassDefFoundError e) {
-            // it does not exist on the classpath
+            net.luckperms.api.model.user.User user = luckPerms.getUserManager().loadUser(UUID.fromString(uuid)).get();
+            if (user == null) return false;
+            net.luckperms.api.context.ContextManager contextManager = luckPerms.getContextManager();
+            net.luckperms.api.context.ImmutableContextSet contextSet = contextManager.getContext(user).orElseGet(contextManager::getStaticContext);
+            net.luckperms.api.cacheddata.CachedPermissionData permissionData = user.getCachedData().getPermissionData(net.luckperms.api.query.QueryOptions.contextual(contextSet));
+            return permissionData.checkPermission("*").asBoolean()
+                    || permissionData.checkPermission("VBans.*").asBoolean()
+                    || permissionData.checkPermission("VBans.prevent").asBoolean();
+
+        } catch (InterruptedException | ExecutionException | NoClassDefFoundError e) {
+            return false;
         }
-        return false;
+
     }
 }

@@ -2,10 +2,8 @@ package de.strifel.vbans.database;
 
 import de.strifel.vbans.VBans;
 
-import java.sql.SQLException;
-
 public class Ban {
-    private String player, by, reason;
+    private final String player, by, reason;
     long until, bannedAt, reducedUntil, id;
 
     Ban(long id, String player, String by, String reason, long until, long bannedAt, long reducedUntil) {
@@ -20,20 +18,12 @@ public class Ban {
 
 
     public String getUsername(VBans vbans) {
-        try {
-            return vbans.getDatabaseConnection().getUsername(player);
-        } catch (SQLException e) {
-            return "ERROR";
-        }
+        return vbans.getDatabaseConnection().getUsername(player);
     }
 
     public String getBannedByUsername(VBans vbans) {
-        try {
-            if (by.equals("Console")) return by;
-            return vbans.getDatabaseConnection().getUsername(by);
-        } catch (SQLException e) {
-            return "ERROR";
-        }
+        if (by.equals("Console")) return by;
+        return vbans.getDatabaseConnection().getUsername(by);
     }
 
     public String getPlayer() {
