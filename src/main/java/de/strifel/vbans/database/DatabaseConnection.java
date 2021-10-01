@@ -69,14 +69,14 @@ public class DatabaseConnection {
     }
   }
 
-  public ArrayList<HistoryBan> getBanHistory(String userUUID, boolean includePurged) {
-    ArrayList<HistoryBan> bans = new ArrayList<>();
+  public ArrayList<HistoricalBan> getBanHistory(String userUUID, boolean includePurged) {
+    ArrayList<HistoricalBan> bans = new ArrayList<>();
     try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(GET_BAN_HISTORY + (includePurged ? "" : " AND PURGED IS NULL"))) {
       statement.setString(1, userUUID);
       ResultSet result = statement.executeQuery();
       if (result.next()) {
         do {
-          bans.add(new HistoryBan(
+          bans.add(new HistoricalBan(
                   result.getLong("id"),
                   userUUID, result.getString("bannedBy"),
                   result.getString("reason"),

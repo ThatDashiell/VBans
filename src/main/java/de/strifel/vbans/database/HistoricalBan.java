@@ -2,10 +2,10 @@ package de.strifel.vbans.database;
 
 import de.strifel.vbans.VBans;
 
-public class HistoryBan extends Ban {
+public class HistoricalBan extends Ban {
   private final String purgedBy, reducedBy;
 
-  HistoryBan(long id, String player, String by, String reason, long until, long bannedAt, long reducedUntil, String purgedBy, String reducedBy) {
+  public HistoricalBan(long id, String player, String by, String reason, long until, long bannedAt, long reducedUntil, String purgedBy, String reducedBy) {
     super(id, player, by, reason, until, bannedAt, reducedUntil);
     this.purgedBy = purgedBy;
     this.reducedBy = reducedBy;

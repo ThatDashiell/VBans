@@ -3,7 +3,7 @@ package de.strifel.vbans.commands;
 import com.velocitypowered.api.command.CommandSource;
 import de.strifel.vbans.Util;
 import de.strifel.vbans.VBans;
-import de.strifel.vbans.database.HistoryBan;
+import de.strifel.vbans.database.HistoricalBan;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -27,10 +27,10 @@ public class CommandBanHistory extends VBanCommand {
     CommandSource commandSource = commandInvocation.source();
 
     if (strings.length == 1) {
-      List<HistoryBan> bans = database.getBanHistory(server.getPlayer(strings[0]).isPresent() ? server.getPlayer(strings[0]).get().getUniqueId().toString() : database.getUUID(strings[0]), commandSource.hasPermission("VBans.history.seeDeleted"));
+      List<HistoricalBan> bans = database.getBanHistory(server.getPlayer(strings[0]).isPresent() ? server.getPlayer(strings[0]).get().getUniqueId().toString() : database.getUUID(strings[0]), commandSource.hasPermission("VBans.history.seeDeleted"));
       commandSource.sendMessage(Component.text("Ban history of " + strings[0]).color(COLOR_YELLOW));
       commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
-      for (HistoryBan ban : bans) {
+      for (HistoricalBan ban : bans) {
         commandSource.sendMessage(generateBanText(ban));
       }
       commandSource.sendMessage(Component.text("----------------------------------------").color(COLOR_YELLOW));
@@ -53,7 +53,7 @@ public class CommandBanHistory extends VBanCommand {
     return commandInvocation.source().hasPermission("VBans.history");
   }
 
-  private Component generateBanText(HistoryBan ban) {
+  private Component generateBanText(HistoricalBan ban) {
     Component banText =
             Component.text("#" + ban.getId() + " " + DATE_FORMAT.format(ban.getBannedAt() * 1000) + ": ")
                     .append(Component.text("\"" + ban.getReason() + "\"").decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
