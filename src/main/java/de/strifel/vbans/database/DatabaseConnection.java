@@ -222,6 +222,8 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 0;
         }
     }
 }
