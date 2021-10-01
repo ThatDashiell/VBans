@@ -11,20 +11,20 @@ public class DatabaseConnection {
 
     private final HikariDataSource dataSource;
 
-    public static final String BANED_CRITERIA = "purged IS NULL and ((reducedUntil is NULL and (until = -1 or until > ?)) or (reducedUntil = -1 or reducedUntil > ?))";
+    public static final String BANNED_CRITERIA = "purged IS NULL and ((reducedUntil is NULL and (until = -1 or until > ?)) or (reducedUntil = -1 or reducedUntil > ?))";
 
     private static final String INSERT_BAN = "INSERT INTO ban_bans (user, until, bannedBy, reason, issuedAt) VALUES (?, ?, ?, ?, ?)";
-    private static final String GET_BAN = "SELECT id, reason, until, bannedBy, reducedUntil, issuedAt FROM ban_bans WHERE " + BANED_CRITERIA + " and user = ? LIMIT 1";
+    private static final String GET_BAN = "SELECT id, reason, until, bannedBy, reducedUntil, issuedAt FROM ban_bans WHERE " + BANNED_CRITERIA + " and user = ? LIMIT 1";
     private static final String GET_BAN_HISTORY = "SELECT id, reason, until, bannedBy, reducedUntil, issuedAt, purged, reducedBy  FROM ban_bans WHERE user = ?";
     private static final String SET_USERNAME = "INSERT INTO ban_nameCache (user, username) VALUES (?, ?)";
     private static final String UPDATE_USERNAME = "UPDATE ban_nameCache SET username=? WHERE user=?";
     private static final String GET_USERNAME = "SELECT username FROM ban_nameCache WHERE user=? LIMIT 1";
     private static final String GET_UUID = "SELECT user FROM ban_nameCache WHERE username=? LIMIT 1";
-    private static final String PURGE_BANS = "UPDATE ban_bans SET purged=? WHERE " + BANED_CRITERIA + " and user = ?";
+    private static final String PURGE_BANS = "UPDATE ban_bans SET purged=? WHERE " + BANNED_CRITERIA + " and user = ?";
     private static final String PURGE_BAN = "UPDATE ban_bans SET purged=? WHERE user = ? AND id=?";
-    private static final String REDUCE_BANS = "UPDATE ban_bans SET reducedUntil=?, reducedBy=?, reducedAt=? WHERE " + BANED_CRITERIA + " AND user=?";
+    private static final String REDUCE_BANS = "UPDATE ban_bans SET reducedUntil=?, reducedBy=?, reducedAt=? WHERE " + BANNED_CRITERIA + " AND user=?";
     private static final String GET_USERNAMES_BASE = "SELECT username FROM ban_bans INNER JOIN ban_nameCache ON ban_bans.user = ban_nameCache.user WHERE GROUP BY username";
-    private static final String GET_BAN_COUNT = "SELECT count(*) FROM ban_bans WHERE " + BANED_CRITERIA;
+    private static final String GET_BAN_COUNT = "SELECT count(*) FROM ban_bans WHERE " + BANNED_CRITERIA;
 
     public DatabaseConnection(String server, int port, String username, String password, String database) throws ClassNotFoundException, SQLException {
         synchronized (this) {

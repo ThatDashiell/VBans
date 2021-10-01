@@ -48,7 +48,7 @@ public class CommandReduce implements SimpleCommand {
 
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation commandInvocation) {
-        return CompletableFuture.supplyAsync(() -> database.getUsernamesByQuery(DatabaseConnection.BANED_CRITERIA));
+        return CompletableFuture.supplyAsync(() -> database.getUsernamesByQuery(DatabaseConnection.BANNED_CRITERIA));
     }
 
     @Override

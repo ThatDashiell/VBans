@@ -52,7 +52,7 @@ public class CommandPurgeBan implements SimpleCommand {
 
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation commandInvocation) {
-        return CompletableFuture.supplyAsync(() -> database.getUsernamesByQuery(DatabaseConnection.BANED_CRITERIA.replace("?", (System.currentTimeMillis() / 1000) + "")));
+        return CompletableFuture.supplyAsync(() -> database.getUsernamesByQuery(DatabaseConnection.BANNED_CRITERIA.replace("?", (System.currentTimeMillis() / 1000) + "")));
     }
 
     @Override
